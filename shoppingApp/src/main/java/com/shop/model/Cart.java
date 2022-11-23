@@ -1,17 +1,16 @@
 package com.shop.model;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.MapKeyClass;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
@@ -29,12 +28,12 @@ public class Cart {
 	@OneToOne(mappedBy = "cart")
 	private Customer customer;
 	
-	@OneToMany(fetch = FetchType.LAZY)
-	@MapKeyClass(Product.class)
-	@ElementCollection(targetClass = Integer.class)
-	@JoinTable(name="cart_Product_List")
-	Map<Product,Integer>productListCart = new HashMap<>();
-//	private Map<Product,Integer> productListCart;
+//	@OneToMany(fetch = FetchType.LAZY)
+	@ElementCollection
+	@CollectionTable(name="cart_product_list", joinColumns = {@JoinColumn}) 
+	@MapKeyJoinColumn(name="product_Id")
+	@Column(name="quantity")
+	private Map<Product,Integer> productListCart;
 	
 
 }

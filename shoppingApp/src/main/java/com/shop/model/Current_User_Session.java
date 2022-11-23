@@ -17,6 +17,7 @@ public class Current_User_Session {
 	
 	@Id
 	private Integer userId;
+	
 	private LocalDate localdate;
 	private String key;
 
