@@ -7,5 +7,7 @@ import com.shop.model.Customer;
 
 @Repository
 public interface CustomerRepo extends JpaRepository<Customer, Integer> {
+	
+	public Customer findByemail(String email);
 
 }

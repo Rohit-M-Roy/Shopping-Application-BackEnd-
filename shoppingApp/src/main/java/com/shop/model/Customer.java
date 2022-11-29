@@ -8,6 +8,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -17,15 +19,17 @@ import com.shop.enums.CustomerGender;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
-public class Customer {
+public class Customer{
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer customerId;
 	private String firstName;
 	private String lastName;
@@ -44,5 +48,8 @@ public class Customer {
 	
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private Set<Orders> customer_Orders;
+	
+	
+	
 
 }
