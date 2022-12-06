@@ -17,7 +17,14 @@ import javax.persistence.MapKeyJoinColumn;
 
 import com.shop.enums.OrderStatus;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Orders {
 	
 	@Id

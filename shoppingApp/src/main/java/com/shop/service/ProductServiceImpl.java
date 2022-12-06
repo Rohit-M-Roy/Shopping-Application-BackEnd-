@@ -1,17 +1,25 @@
 package com.shop.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.shop.exception.ProductException;
+import com.shop.model.Category;
 import com.shop.model.Product;
+import com.shop.repository.CategoryRepo;
 import com.shop.repository.ProductRepo;
 
+@Service
 public class ProductServiceImpl implements ProductService{
 	
 	@Autowired
 	ProductRepo prep;
+	
+	@Autowired
+	CategoryRepo catRepo;
 
 	@Override
 	public List<Product> viewAllProducts() {
@@ -31,7 +39,8 @@ public class ProductServiceImpl implements ProductService{
 		if(checkProduct != null) {
 			throw new ProductException("Product Already in the database");
 		}
-		
+		Category addedCategory = catRepo.save(product.getCategory());
+		product.setCategory(addedCategory);
 		Product addedProduct = prep.save(product);
 		
 		return addedProduct;
@@ -40,20 +49,19 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public Product updateProduct(Product product) throws ProductException{
 		
-		Product fetchedProduct = prep.findByproductName(product.getProductName());
+		Optional<Product> fetchedProduct = prep.findById(product.getProductId());
 		
-		if(fetchedProduct == null) {
+		if(fetchedProduct.isEmpty()) {
 			throw new ProductException("no product in the database to update");
 		}
 		
-		fetchedProduct.setCategory(product.getCategory());
-		fetchedProduct.setColor(product.getColor());
-		fetchedProduct.setDimension(product.getDimension());
-		fetchedProduct.setPrice(product.getPrice());
-		fetchedProduct.setQuantity(product.getQuantity());
-		fetchedProduct.setSpecification(product.getSpecification());
+		fetchedProduct.get().setColor(product.getColor());
+		fetchedProduct.get().setDimension(product.getDimension());
+		fetchedProduct.get().setPrice(product.getPrice());
+		fetchedProduct.get().setQuantity(product.getQuantity());
+		fetchedProduct.get().setSpecification(product.getSpecification());
 		
-		return prep.save(fetchedProduct);
+		return prep.save(fetchedProduct.get());
 	}
 
 	@Override

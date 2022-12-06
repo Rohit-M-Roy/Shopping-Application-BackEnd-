@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.shop.enums.CustomerGender;
 
 import lombok.AllArgsConstructor;
@@ -44,9 +45,11 @@ public class Customer{
 	private String email;
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(referencedColumnName = "cartId")
+	@JsonIgnore
 	private Cart cart;
 	
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+	@JsonIgnore
 	private Set<Orders> customer_Orders;
 	
 	

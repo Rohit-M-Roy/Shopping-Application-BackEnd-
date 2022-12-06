@@ -37,6 +37,12 @@ public class AddressServiceImpl implements AddressService{
 		
 		Address checkAddress = arep.findById(address.getAddressId()).orElseThrow(()->new AddressException("No address with such id found"));
 		
+		checkAddress.setBuildingName(address.getBuildingName());
+		checkAddress.setCity(address.getCity());
+		checkAddress.setPincode(address.getPincode());
+		checkAddress.setState(address.getState());
+		checkAddress.setStreetNo(address.getStreetNo());
+		
 		Address updatedAddress = arep.save(checkAddress);
 		
 		return updatedAddress;
@@ -44,14 +50,13 @@ public class AddressServiceImpl implements AddressService{
 
 	@Override
 	public Address removeAddress(int customerId) throws AddressException,CustomerException {
-		// TODO Auto-generated method stub
+		
 		Customer fetchedCustomer = crep.findById(customerId).orElseThrow(()->new CustomerException("No such Customer in the database"));
 		
 		Address address = fetchedCustomer.getAddress();
-		int addressid = fetchedCustomer.getAddress().getAddressId();
-		
-		arep.deleteById(addressid);
-		
+		fetchedCustomer.setAddress(null);
+		arep.delete(address);
+		crep.save(fetchedCustomer);
 		return address;
 	}
 
