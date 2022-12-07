@@ -13,6 +13,7 @@ import com.shop.model.Customer;
 import com.shop.model.Product;
 import com.shop.repository.CartRepo;
 import com.shop.repository.CustomerRepo;
+import com.shop.repository.ProductRepo;
 
 @Service
 public class CartServiceImpl implements CartService{
@@ -22,61 +23,80 @@ public class CartServiceImpl implements CartService{
 	
 	@Autowired
 	CustomerRepo customerRepo;
+	
+	@Autowired
+	ProductRepo prep;
 
 	@Override
-	public Cart addProductToCart(Integer customerId, Product p, Integer q) throws CustomerException{
+	public Cart addProductToCart(Integer customerId, Integer pid, Integer q) throws CustomerException,ProductException{
 		
 		Customer getCustomer = customerRepo.findById(customerId).orElseThrow(()-> new CustomerException("No Such Customer in the database"));
 		
 		Cart cart = getCustomer.getCart();
+		Product p = prep.findById(pid).orElseThrow(()-> new ProductException("No Product witht the given product Id"));
 		
-		cart.getProductListCart().put(p,cart.getProductListCart().getOrDefault(p, q)+ q);
+		Map<Product,Integer> mapOfProducts = cart.getProductListCart();
+		
+		if(mapOfProducts.containsKey(p)) {
+			mapOfProducts.put(p, mapOfProducts.get(p)+q);
+		}else {
+			
+			mapOfProducts.put(p, q);
+			
+		}
 		
 		crep.save(cart);
-		
 		customerRepo.save(getCustomer);
 		
+		p.setQuantity(p.getQuantity()-q);
+		
+		if(p.getQuantity() < 0) {
+			throw new ProductException("Not sufficient quantity in the warehouse");
+		}
+		
+		prep.save(p);
+	
 		return cart;
 	}
 
 	@Override
-	public Cart removeProductFromCart(Cart cart, Product p) throws CustomerException,ProductException,CartException{
+	public Cart removeProductFromCart(Integer cartid, Integer pid) throws CustomerException,ProductException,CartException{
 		
-		Cart getCart = crep.findById(cart.getCartId()).orElseThrow(()-> new CartException("No cart by the given id, Provide a valid cart Id"));
-		
-		Customer getCustomerFromcart = cart.getCustomer();
-		
+		Cart getCart = crep.findById(cartid).orElseThrow(()-> new CartException("No cart by the given id, Provide a valid cart Id"));
+		Product p = prep.findById(pid).orElseThrow(()-> new ProductException("No Product witht the given product Id"));
+		Integer quantity = getCart.getProductListCart().get(p);
 		//recheck customer in the customer table
-		Customer checkCustomer = customerRepo.findById(cart.getCustomer().getCustomerId()).orElseThrow(()-> new CustomerException("No Customer availabe in the Customer database"));
+		Customer checkCustomer = customerRepo.findById(getCart.getCustomer().getCustomerId()).orElseThrow(()-> new CustomerException("No Customer availabe in the Customer database"));
 		
 		getCart.getProductListCart().remove(p);
 		
 		Cart savedCart = crep.save(getCart);
-		
 		customerRepo.save(checkCustomer);
-		
+		//adding quantity back to product dB
+		p.setQuantity(p.getQuantity()+quantity);
+		prep.save(p);
 		return savedCart;
 	}
 
-	@Override
-	public Cart updateProductQuantity(Integer cartId, Product p, Integer q) throws CartException,CustomerException{
-		
-		Cart getCart = crep.findById(cartId).orElseThrow(()-> new CartException("No Cart with this cart Id"));
-		
-		Customer getCustomerFromcart = getCart.getCustomer();
-		
-		//recheck customer in the customer table
-		Customer checkCustomer = customerRepo.findById(getCart.getCustomer().getCustomerId()).orElseThrow(()-> new CustomerException("No Customer availabe in the Customer database"));
-		
-		Map<Product,Integer> map = getCart.getProductListCart();
-		
-		map.put(p, map.getOrDefault(p, q)+q);
-		
-		crep.save(getCart);
-		customerRepo.save(checkCustomer);
-		
-		return getCart;
-	}
+//	@Override
+//	public Cart updateProductQuantity(Integer cartId, Integer pid, Integer q) throws CartException,CustomerException{
+//		
+//		Cart getCart = crep.findById(cartId).orElseThrow(()-> new CartException("No Cart with this cart Id"));
+//		
+//		Customer getCustomerFromcart = getCart.getCustomer();
+//		
+//		//recheck customer in the customer table
+//		Customer checkCustomer = customerRepo.findById(getCart.getCustomer().getCustomerId()).orElseThrow(()-> new CustomerException("No Customer availabe in the Customer database"));
+//		
+//		Map<Product,Integer> map = getCart.getProductListCart();
+//		
+//		map.put(p, map.getOrDefault(p, q)+q);
+//		
+//		crep.save(getCart);
+//		customerRepo.save(checkCustomer);
+//		
+//		return getCart;
+//	}
 
 	@Override
 	public String removeAllProducts(Integer cartId) throws CartException {
