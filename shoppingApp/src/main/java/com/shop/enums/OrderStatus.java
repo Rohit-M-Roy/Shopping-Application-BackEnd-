@@ -1,8 +1,5 @@
 package com.shop.enums;
 
 public enum OrderStatus {
-	Processed,
-	Shipped,
-	Cancelled,
-	Refunnded
+	Processed,Shipped,Delivered,Cancelled,Refunnded
 }

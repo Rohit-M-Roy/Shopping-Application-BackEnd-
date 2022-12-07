@@ -10,9 +10,9 @@ import com.shop.model.Product;
 
 public interface CartService {
 	
-	public Cart addProductToCart(Integer customerId, Product p, Integer q)throws CustomerException;
-	public Cart removeProductFromCart(Cart cart, Product p)throws CustomerException,ProductException,CartException;
-	public Cart updateProductQuantity(Integer cartId, Product p, Integer q)throws CartException,CustomerException;
+	public Cart addProductToCart(Integer customerId, Integer pid, Integer q)throws CustomerException,ProductException;
+	public Cart removeProductFromCart(Integer cartId, Integer pid)throws CustomerException,ProductException,CartException;
+//	public Cart updateProductQuantity(Integer cartId, Integer pid, Integer q)throws CartException,CustomerException;
 	public String removeAllProducts(Integer cartId)throws CartException;
 	public Map<Product,Integer> VeiwAllProducts(Integer cartId)throws CartException;
 
